@@ -139,8 +139,4 @@ plt.text(205,-1.85,'Longitude',fontsize=28)
 
 plt.subplots_adjust(top=0.95,bottom=0.14,left=0.05,right=0.95,hspace=0.15,wspace=0.2)
 
-plotname = 'Spaghetti_plot_DJF_SST_OBS_ENDJF' # Figure name
-plotsDir = '/home/Plots/' # directory to save the Figure
-
-#plt.savefig(plotsDir + plotname+ '.eps', bbox_inches='tight')
 plt.show()
