@@ -10,4 +10,4 @@ The calculation of velocity potential and the irrotational (divergent) wind comp
 
 The outputs from these scripts correspond to the main figures presented in the paper.
 
-
+All scripts were run using Python 3.10.12.
