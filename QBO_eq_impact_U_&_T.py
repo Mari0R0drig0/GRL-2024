@@ -55,8 +55,8 @@ def seasonal_anomalies_OBS(nlat, nlon, nyr, field, nmonth):
   return anomdetrend
 
 # QBO composite years
-folder = Path("/home/mrodrigo/Documents/data/re-obs/ERA5/")
-file_to_open = folder / "Ulevs_1000-001_mon.era5_195001_202105_interp.nc"
+folder = Path("/home/data/obs/ERA5/")
+file_to_open = folder / "Ulevs_1000-001_mon.era5.nc"
 
 file = ncdf(file_to_open, "r")
 
@@ -96,8 +96,8 @@ indices_E = np.where(index <= -0.75)[0]
 print('Indices Easterly: '+str(1950+indices_E), indices_E.shape[0])
 
 # Zonal wind field
-folder = Path("/home/mrodrigo/Documents/data/re-obs/ERA5/")
-file_to_open = folder / "Ulevs_1000-001_mon.era5_195001_202105_interp.nc"
+folder = Path("/home/data/obs/ERA5/")
+file_to_open = folder / "Ulevs_1000-001_mon.era5.nc"
 
 file = ncdf(file_to_open, "r")
 
@@ -138,8 +138,8 @@ coeff_U_E = np.mean(Ua_lat_mean[indices_E,:,:], axis=0)
 coeff_U_diff = coeff_U_W - coeff_U_E
 
 # Temperature field
-folder = Path("/home/mrodrigo/Documents/data/re-obs/ERA5/")
-file_to_open = folder / "Tlevs_1000-001_mon.era5_195001_202105_interp.nc"
+folder = Path("/home/data/obs/ERA5/")
+file_to_open = folder / "Tlevs_1000-001_mon.era5.nc"
 
 file = ncdf(file_to_open, "r")
 
@@ -220,7 +220,5 @@ ax.set_xticklabels(['0','30 E','60 E','90 E','120 E','150 E','180','150 W','120 
 
 plt.xlim(0,357.5)
 plt.ylim(1000,5)
-
-#plt.savefig("/home/mrodrigo/Documents/DynVar_SNAP_23/Letter/Plots/Main/Eq_U_&_T_JJA_QBO_0.75std_50hPa_JJA_ERA5"+'.eps', bbox_inches='tight')
 
 plt.show()
