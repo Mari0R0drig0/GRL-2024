@@ -33,6 +33,14 @@ def seasonal_value(nlat, nlon, nyr, field, nmonth):
     return value
 
 def t_test(nlat,nlon,field,indices_1,indices_2,pval,equal_variances):
+  """ Two-tailed t-test to evaluate the null hypothesis that two independent samples have equal means, assuming identical population variances.
+  nlat: number of latitudes
+  nlon: number of longitudes
+  field: field where we compute the statistical test
+  indices_1 and indices_2: years/seasons for each sample
+  pval: the p-value threshold
+  equal_variances: True or False equal population variances
+  """
     pvalue = np.empty([nlat,nlon])
     test = np.empty([nlat,nlon])
     for i in range (nlat):
