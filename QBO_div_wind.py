@@ -32,6 +32,16 @@ def seasonal_value(nlat, nlon, nyr, field, nmonth):
     
     return value
 
+def t_test(nlat,nlon,field,indices_1,indices_2,pval,equal_variances):
+    pvalue = np.empty([nlat,nlon])
+    test = np.empty([nlat,nlon])
+    for i in range (nlat):
+        for j in range (nlon):
+            pvalue = stats.ttest_ind(field[indices_1,i,j],field[indices_2,i,j],axis=0,equal_var=equal_variances,nan_policy='propagate').pvalue
+            if (pvalue<=pval): test[i,j] = 1
+            else: test[i,j] = 0
+    return test
+
 # El Niño DJF QBO W JJASON
 # ONI NOAA 0.5 K: 1957, 1963, 1969, 1982, 1986, 1987, 1997, 2002, 2004, 2006, 2009, 2015 (12)
 #indices_W = np.array([1957, 1963, 1969, 1982, 1986, 1987, 1997, 2002, 2004, 2006, 2009, 2015]) - 1950
@@ -47,7 +57,7 @@ indices_W = np.array([1953, 1955, 1964, 1967, 1969, 1973, 1976, 1978, 1983, 1985
 # E: 1952 1954 1956 1963 1968 1970 1977 1982 1984 1987 1992 1994 1996 1998 2001 2010 2016 2018 2020 (19)
 indices_E = np.array([1952, 1954, 1956, 1963, 1968, 1970, 1977, 1982, 1984, 1987, 1992, 1994, 1996, 1998, 2001, 2010, 2016, 2018, 2020]) - 1950
 
-n = 10
+n = 10 # pressure level: 10 = 100 hPa
 # Zonal wind
 ncu = ncdf(example_data_path('/home/data/obs/ERA5/Ulevs_1000-001_mon.era5.nc'), 'r')
 uwnd_tmp = ncu.variables['u'][:,n,:,:]
@@ -101,32 +111,14 @@ V_diff = V_W - V_E
 
 # Statistical test
 ## VP
-pvalue = np.empty([nlats,nlons])
-test_VP = np.empty([nlats,nlons])
-for i in range (nlats):
-    for j in range (nlons):
-        pvalue = stats.ttest_ind(VP[indices_W,i,j],VP[indices_E,i,j],axis=0,
-                                 equal_var=True,nan_policy='propagate').pvalue
-        if (pvalue<=0.05): test_VP[i,j] = 1
-        else: test_VP[i,j] = 0
+pval = 0.05
+test_VP = t_test(nlats,nlons,VP,indices_W,indices_E,pval,True)
 
 ## U and V
-pvalue = np.empty([nlats,nlons])
-test_U = np.empty([nlats,nlons])
-test_V = np.empty([nlats,nlons])
-for i in range (nlats):
-    for j in range (nlons):
-        pvalue = stats.ttest_ind(U[indices_W,i,j],U[indices_E,i,j],axis=0,
-                                 equal_var=True,nan_policy='propagate').pvalue
-        if (pvalue<=0.05): test_U[i,j] = 1
-        else: test_U[i,j] = 0
+test_U = t_test(nlats,nlons,U,indices_W,indices_E,pval,True)
+test_V = t_test(nlats,nlons,V,indices_W,indices_E,pval,True)
 
-        pvalue = stats.ttest_ind(V[indices_W,i,j],V[indices_E,i,j],axis=0,
-                                 equal_var=True,nan_policy='propagate').pvalue
-        if (pvalue<=0.05): test_V[i,j] = 1
-        else: test_V[i,j] = 0
-
-# Significant differeces
+# Significant differences
 ## VP
 VP_diff_test = np.copy(VP_diff)
 for i in range (nlats):
