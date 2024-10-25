@@ -54,6 +54,24 @@ def seasonal_anomalies_OBS(nlat, nlon, nyr, field, nmonth):
   
   return anomdetrend
 
+def t_test(nlev,nlon,field,indices_1,indices_2,pval,equal_variances):
+  """ Two-tailed t-test to evaluate the null hypothesis that two independent samples have equal means, assuming identical population variances.
+    nlev: number of vertical levels
+    nlon: number of longitudes
+    field: field where we compute the statistical test
+    indices_1 and indices_2: years/seasons for each sample
+    pval: the p-value threshold
+    equal_variances: True or False equal population variances
+    """
+    test = np.empty([nlev,nlon])
+    for i in range (nlev):
+        for j in range (nlon):
+            pvalue = stats.ttest_ind(field[indices_1,i,j],field[indices_2,i,j],axis=0,equal_var=equal_variances,nan_policy='propagate').pvalue
+            if (pvalue<=pval): test[i,j] = 1
+            else: test[i,j] = 0
+    
+    return test
+
 # QBO composite years
 folder = Path("/home/data/obs/ERA5/")
 file_to_open = folder / "Ulevs_1000-001_mon.era5.nc"
@@ -163,19 +181,12 @@ coeff_T_E = np.mean(Ta_lat_mean[indices_E,:,:], axis=0)
 coeff_T_diff = coeff_T_W - coeff_T_E
 
 # Student t-test
-test_T = np.empty([nlev,nlon])
-for i in range (nlev):
-    for j in range (nlon):
-        pvalue = stats.ttest_ind(Ta_lat_mean[indices_W,i,j],Ta_lat_mean[indices_E,i,j],axis=0,equal_var=True,nan_policy='propagate').pvalue
-        if (pvalue<=0.05): test_T[i,j] = 1
-        else: test_T[i,j] = 0
-            
-test_U = np.empty([nlev,nlon])
-for i in range (nlev):
-    for j in range (nlon):
-        pvalue = stats.ttest_ind(Ua_lat_mean[indices_W,i,j],Ua_lat_mean[indices_E,i,j],axis=0,equal_var=True,nan_policy='propagate').pvalue
-        if (pvalue<=0.05): test_U[i,j] = 1
-        else: test_U[i,j] = 0
+# T
+pval = 0.05
+test_T = t_test(nlev,nlon,Ta_lat_mean,indices_W,indices_E,pval,True)
+
+# U
+test_U = t_test(nlev,nlon,Ua_lat_mean,indices_W,indices_E,pval,True)   
 
 # Significant differences
 coeff_T_diff_test = np.copy(coeff_T_diff)
